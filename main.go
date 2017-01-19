@@ -58,7 +58,10 @@ func setResolution(args []string) {
 		os.Exit(1)
 	}
 
-	image.Write(output)
+	if err := image.Write(output); err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+		os.Exit(1)
+	}
 }
 
 func main() {
