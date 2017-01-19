@@ -162,16 +162,6 @@ func (self *Image) dump(writer io.Writer) error {
 	return nil
 }
 
-func (self *Image) Dump() ([]byte, error) {
-	buf := bytes.NewBuffer(make([]byte, 0))
-
-	if err := self.dump(buf); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
-}
-
 func (self *Image) Write(path string) error {
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
