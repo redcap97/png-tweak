@@ -27,11 +27,11 @@ func help() {
 	fmt.Fprintf(os.Stderr, "Usage: %s [set-resolution | help]\n", os.Args[0])
 }
 
-func setResolution(args []string) {
+func setResolution(name string, args []string) {
 	var input, output string
 	var ppi uint
 
-	flagSet := flag.NewFlagSet(os.Args[1], flag.ExitOnError)
+	flagSet := flag.NewFlagSet(name, flag.ExitOnError)
 
 	flagSet.StringVar(&input, "input", "", "Path for input")
 	flagSet.StringVar(&output, "output", "", "Path for output")
@@ -40,7 +40,7 @@ func setResolution(args []string) {
 	flagSet.Parse(args)
 
 	if input == "" || output == "" || ppi == 0 {
-		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[1])
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", name)
 		flagSet.PrintDefaults()
 		os.Exit(99)
 	}
@@ -70,12 +70,12 @@ func main() {
 		os.Exit(99)
 	}
 
-	subcommand := os.Args[1]
+	name := os.Args[1]
 	args := os.Args[2:]
 
-	switch subcommand {
+	switch name {
 	case "set-resolution":
-		setResolution(args)
+		setResolution(name, args)
 
 	case "help":
 		help()
