@@ -122,44 +122,26 @@ func Load(path string) (*Image, error) {
 	return image, nil
 }
 
-func createWriteError(err error) error {
-	if err == nil {
-		return io.ErrShortWrite
-	} else {
-		return err
-	}
-}
-
-func (self *Image) dump(writer io.Writer) error {
+func (self *Image) dump(w io.Writer) error {
 	u32 := make([]byte, 4)
+	writer := &WriterWithError{writer: w}
 
-	if n, err := writer.Write(Signature); n != len(Signature) || err != nil {
-		return createWriteError(err)
-	}
+	writer.Write(Signature)
 
 	for e := self.ChunkList.Front(); e != nil; e = e.Next() {
 		chunk := e.Value.(*Chunk)
 
 		binary.BigEndian.PutUint32(u32, chunk.Length)
-		if n, err := writer.Write(u32); n != len(u32) || err != nil {
-			return createWriteError(err)
-		}
+		writer.Write(u32)
 
-		if n, err := writer.Write(chunk.Data); n != len(chunk.Data) || err != nil {
-			return createWriteError(err)
-		}
+		writer.Write(chunk.Data)
 
 		binary.BigEndian.PutUint32(u32, chunk.Crc)
-		if n, err := writer.Write(u32); n != len(u32) || err != nil {
-			return createWriteError(err)
-		}
+		writer.Write(u32)
 	}
 
-	if n, err := writer.Write(self.Trailer); n != len(self.Trailer) || err != nil {
-		return createWriteError(err)
-	}
-
-	return nil
+	writer.Write(self.Trailer)
+	return writer.Error
 }
 
 func (self *Image) Write(path string) error {
