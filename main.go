@@ -23,8 +23,13 @@ import (
 	"os"
 )
 
+var usage string = `Example Usage:
+  png-tweak set-resolution -input <Input> -output <Output> -ppi <PPI>
+  png-tweak help
+`
+
 func help() {
-	fmt.Fprintf(os.Stderr, "Usage: %s [set-resolution | help]\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "%s", usage)
 }
 
 func setResolution(name string, args []string) {
