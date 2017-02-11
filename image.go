@@ -21,47 +21,12 @@ import (
 	"container/list"
 	"encoding/binary"
 	"errors"
-	"hash/crc32"
 	"io"
 	"io/ioutil"
 	"os"
 )
 
 var Signature = []byte{0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}
-
-type Chunk struct {
-	Length uint32
-	Data   []byte
-	Crc    uint32
-}
-
-func (self *Chunk) Type() string {
-	return string(self.Data[0:4])
-}
-
-type PhysChunk struct {
-	X    uint32
-	Y    uint32
-	Unit uint8
-}
-
-func (self *PhysChunk) GenerateChunk() *Chunk {
-	buf := bytes.NewBuffer(make([]byte, 0))
-	u32 := make([]byte, 4)
-
-	buf.WriteString("pHYs")
-
-	binary.BigEndian.PutUint32(u32, self.X)
-	buf.Write(u32)
-
-	binary.BigEndian.PutUint32(u32, self.Y)
-	buf.Write(u32)
-
-	buf.WriteByte(self.Unit)
-
-	data := buf.Bytes()
-	return &Chunk{9, data, crc32.ChecksumIEEE(data)}
-}
 
 type Image struct {
 	ChunkList *list.List
