@@ -23,7 +23,7 @@ import (
 	"os"
 )
 
-var usage string = `Example Usage:
+const usage = `Example Usage:
   png-tweak set-resolution -input <Input> -output <Output> -ppi <PPI>
   png-tweak help
 `
