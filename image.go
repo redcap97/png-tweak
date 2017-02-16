@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"container/list"
 	"encoding/binary"
@@ -109,17 +110,27 @@ func (self *Image) dump(w io.Writer) error {
 	return writer.Error
 }
 
-func (self *Image) Write(path string) error {
+func (self *Image) Write(path string) (retErr error) {
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if err := file.Close(); retErr == nil {
+			retErr = err
+		}
+	}()
 
-	err = self.dump(file)
-	if err1 := file.Close(); err == nil {
-		err = err1
+	w := bufio.NewWriterSize(file, 64*1024)
+	if err := self.dump(w); err != nil {
+		return err
 	}
-	return err
+
+	if err := w.Flush(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (self *Image) SetPhysChunk(phys *PhysChunk) error {
