@@ -88,13 +88,13 @@ func Load(path string) (*Image, error) {
 	return image, nil
 }
 
-func (self *Image) dump(w io.Writer) error {
+func (image *Image) dump(w io.Writer) error {
 	u32 := make([]byte, 4)
 	writer := &WriterWithError{writer: w}
 
 	writer.Write(Signature)
 
-	for e := self.ChunkList.Front(); e != nil; e = e.Next() {
+	for e := image.ChunkList.Front(); e != nil; e = e.Next() {
 		chunk := e.Value.(*Chunk)
 
 		binary.BigEndian.PutUint32(u32, chunk.Length)
@@ -106,11 +106,11 @@ func (self *Image) dump(w io.Writer) error {
 		writer.Write(u32)
 	}
 
-	writer.Write(self.Trailer)
+	writer.Write(image.Trailer)
 	return writer.Error
 }
 
-func (self *Image) Write(path string) (retErr error) {
+func (image *Image) Write(path string) (retErr error) {
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
@@ -122,7 +122,7 @@ func (self *Image) Write(path string) (retErr error) {
 	}()
 
 	w := bufio.NewWriterSize(file, 64*1024)
-	if err := self.dump(w); err != nil {
+	if err := image.dump(w); err != nil {
 		return err
 	}
 
@@ -133,24 +133,24 @@ func (self *Image) Write(path string) (retErr error) {
 	return nil
 }
 
-func (self *Image) SetPhysChunk(phys *PhysChunk) error {
+func (image *Image) SetPhysChunk(phys *PhysChunk) error {
 	physChunk := phys.GenerateChunk()
 
-	for e := self.ChunkList.Front(); e != nil; e = e.Next() {
+	for e := image.ChunkList.Front(); e != nil; e = e.Next() {
 		chunk := e.Value.(*Chunk)
 
 		if chunk.Type() == "pHYs" {
-			self.ChunkList.InsertBefore(physChunk, e)
-			self.ChunkList.Remove(e)
+			image.ChunkList.InsertBefore(physChunk, e)
+			image.ChunkList.Remove(e)
 			return nil
 		}
 	}
 
-	for e := self.ChunkList.Front(); e != nil; e = e.Next() {
+	for e := image.ChunkList.Front(); e != nil; e = e.Next() {
 		chunk := e.Value.(*Chunk)
 
 		if chunk.Type() == "IDAT" {
-			self.ChunkList.InsertBefore(physChunk, e)
+			image.ChunkList.InsertBefore(physChunk, e)
 			return nil
 		}
 	}
