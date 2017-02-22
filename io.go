@@ -25,9 +25,9 @@ type WriterWithError struct {
 	Error  error
 }
 
-func (self *WriterWithError) Write(buf []byte) {
-	if self.Error != nil {
+func (w *WriterWithError) Write(buf []byte) {
+	if w.Error != nil {
 		return
 	}
-	_, self.Error = self.writer.Write(buf)
+	_, w.Error = w.writer.Write(buf)
 }

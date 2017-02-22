@@ -22,6 +22,6 @@ type Chunk struct {
 	Crc    uint32
 }
 
-func (self *Chunk) Type() string {
-	return string(self.Data[0:4])
+func (chunk *Chunk) Type() string {
+	return string(chunk.Data[0:4])
 }

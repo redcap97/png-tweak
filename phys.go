@@ -28,19 +28,19 @@ type PhysChunk struct {
 	Unit uint8
 }
 
-func (self *PhysChunk) GenerateChunk() *Chunk {
+func (phys *PhysChunk) GenerateChunk() *Chunk {
 	buf := bytes.NewBuffer(make([]byte, 0))
 	u32 := make([]byte, 4)
 
 	buf.WriteString("pHYs")
 
-	binary.BigEndian.PutUint32(u32, self.X)
+	binary.BigEndian.PutUint32(u32, phys.X)
 	buf.Write(u32)
 
-	binary.BigEndian.PutUint32(u32, self.Y)
+	binary.BigEndian.PutUint32(u32, phys.Y)
 	buf.Write(u32)
 
-	buf.WriteByte(self.Unit)
+	buf.WriteByte(phys.Unit)
 
 	data := buf.Bytes()
 	return &Chunk{9, data, crc32.ChecksumIEEE(data)}
